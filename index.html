@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>あくあたんジェネレーター</title>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script src="aquagen.js"></script>
+    <style>
+      #aquatmpl {
+        display: none;
+      }
+
+      #inputform {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      #inputform div {
+        padding: 0 0.4em;
+      }
+
+      canvas {
+        image-rendering: pixelated;
+      }
+
+      #output {
+        width: 256px;
+      }
+
+      #preview {
+        width: 128px;
+      }
+    </style>
+  </head>
+  <body>
+    <img src="aquamov.png" id="aquatmpl" />
+    <div id="inputform"></div>
+
+    <canvas id="output" width="128" height="128"></canvas>
+    <canvas id="preview" width="32" height="32"></canvas>
+    <p>歩いているあくあたんをクリックで向きが変わるよ</p>
+
+    <button id="download">ダウンロード</button>
+  </body>
+</html>
