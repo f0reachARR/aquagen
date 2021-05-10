@@ -43,7 +43,7 @@ function fromRgb(str) {
 
 function getNewColorMap() {
   const colors = {};
-  $('#inputform input').each((_, elem) => {
+  $('#inputform input[type="color"]').each((_, elem) => {
     elem = $(elem);
     colors[elem.attr('name')] = fromRgb(elem.val());
   });
@@ -58,13 +58,18 @@ function updateAquatan() {
 
   const image = canvas.getImageData(0, 0, 128, 128);
   const colors = getNewColorMap();
+  const bgTrans = $('#bg_trans').prop('checked');
 
   const replacementTable = new Map();
   for (const itemName of Object.keys(tmplColors)) {
-    replacementTable.set(
-      tmplColors[itemName].join('-'),
-      colors[itemName] || tmplColors[itemName]
-    );
+    if (itemName === '背景' && bgTrans) {
+      replacementTable.set(tmplColors[itemName].join('-'), [255, 255, 255, 0]);
+    } else {
+      replacementTable.set(
+        tmplColors[itemName].join('-'),
+        colors[itemName] || tmplColors[itemName]
+      );
+    }
   }
 
   for (let i = 0; i < image.data.length; i += 4) {
@@ -74,6 +79,7 @@ function updateAquatan() {
       image.data[i] = rep[0];
       image.data[i + 1] = rep[1];
       image.data[i + 2] = rep[2];
+      image.data[i + 3] = typeof rep[3] === 'undefined' ? 255 : rep[3];
     }
   }
 
@@ -99,6 +105,8 @@ $(document).ready(() => {
       .appendTo(inputForm);
   }
 
+  $('#bg_trans').on('change', () => updateAquatan());
+
   const outputElem = document.querySelector('#output');
 
   $('#download').click(() => {
@@ -120,6 +128,7 @@ $(document).ready(() => {
     previewCount++;
     if (previewCount == 4) previewCount = 0;
 
+    previewCtx.clearRect(0, 0, 32, 32);
     previewCtx.drawImage(
       outputElem,
       previewCount * 32,
