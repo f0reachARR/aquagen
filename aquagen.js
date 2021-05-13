@@ -120,6 +120,9 @@ $(document).ready(() => {
   }
 
   $('#bg_trans').on('change', () => updateAquatan());
+  $('form').on('reset', () => {
+    setTimeout(() => updateAquatan(), 10); // TODO: こういう実装嫌いなんだが
+  });
 
   const outputElem = document.querySelector('#output');
 
