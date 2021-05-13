@@ -101,6 +101,30 @@ function updateAquatan() {
   console.log('done');
 }
 
+let previewCount = 0;
+let previewPose = 0;
+
+function updatePreviewFrame() {
+  const previewElem = document.querySelector('#preview');
+  const outputElem = document.querySelector('#output');
+  const previewCtx = previewElem.getContext('2d');
+  previewCount++;
+  if (previewCount == 4) previewCount = 0;
+
+  previewCtx.clearRect(0, 0, 32, 32);
+  previewCtx.drawImage(
+    outputElem,
+    previewCount * 32,
+    previewPose * 32,
+    32,
+    32,
+    0,
+    0,
+    32,
+    32
+  );
+}
+
 $(document).ready(() => {
   const inputForm = $('#inputform');
   for (const itemName of Object.keys(tmplColors)) {
@@ -124,9 +148,9 @@ $(document).ready(() => {
     setTimeout(() => updateAquatan(), 10); // TODO: こういう実装嫌いなんだが
   });
 
-  const outputElem = document.querySelector('#output');
-
   $('#download').click(() => {
+    const outputElem = document.querySelector('#output');
+
     const link = document.createElement('a');
     link.download = 'aquatan.png';
     link.href = outputElem.toDataURL('image/png');
@@ -139,26 +163,12 @@ $(document).ready(() => {
   aquaTmplImage.src = 'aquamov.png';
 
   const previewElem = document.querySelector('#preview');
-  const previewCtx = previewElem.getContext('2d');
-  let previewCount = 0;
-  let previewPose = 0;
-  setInterval(() => {
-    previewCount++;
-    if (previewCount == 4) previewCount = 0;
 
-    previewCtx.clearRect(0, 0, 32, 32);
-    previewCtx.drawImage(
-      outputElem,
-      previewCount * 32,
-      previewPose * 32,
-      32,
-      32,
-      0,
-      0,
-      32,
-      32
-    );
-  }, 250);
+  let timer = setInterval(updatePreviewFrame, 250);
+  $('#preview_interval').on('change', () => {
+    clearInterval(timer);
+    timer = setInterval(updatePreviewFrame, $('#preview_interval').val());
+  });
 
   previewElem.addEventListener('click', () => {
     previewPose++;
