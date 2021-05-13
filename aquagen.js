@@ -13,21 +13,29 @@ const tmplColors = {
 };
 
 const defaultColors = {
-  背景: [190, 179, 145],
-  帽子1: [34, 172, 56],
-  帽子2: [137, 201, 151],
-  目: [126, 206, 244],
-  頬: [255, 0, 0],
-  口: [255, 0, 0],
-  手: [255, 0, 0],
-  腹: [255, 0, 0],
-  足: [110, 78, 46],
-  頭: [137, 87, 161],
-  胴体: [137, 87, 161],
+  背景: [190, 179, 145, 255],
+  帽子1: [34, 172, 56, 255],
+  帽子2: [137, 201, 151, 255],
+  目: [126, 206, 244, 255],
+  頬: [255, 0, 0, 255],
+  口: [255, 0, 0, 255],
+  手: [255, 0, 0, 255],
+  腹: [255, 0, 0, 255],
+  足: [110, 78, 46, 255],
+  頭: [137, 87, 161, 255],
+  胴体: [137, 87, 161, 255],
 };
 
+const transparentColor = [255, 255, 255, 0];
+
 function toRgb(arr) {
-  return '#' + arr.map((item) => ('00' + item.toString(16)).slice(-2)).join('');
+  return (
+    '#' +
+    arr
+      .slice(0, 3)
+      .map((item) => ('00' + item.toString(16)).slice(-2))
+      .join('')
+  ); // 透明度はinputが受け付けない
 }
 
 function fromRgb(str) {
@@ -38,7 +46,12 @@ function fromRgb(str) {
     parseInt(str.slice(0, 2), 16),
     parseInt(str.slice(2, 4), 16),
     parseInt(str.slice(4, 6), 16),
+    255, // inputが透明度寄越さないのでデフォ
   ];
+}
+
+function toHex(arr) {
+  return (arr[0] << 16) | (arr[1] << 8) | arr[2];
 }
 
 function getNewColorMap() {
@@ -62,24 +75,23 @@ function updateAquatan() {
 
   const replacementTable = new Map();
   for (const itemName of Object.keys(tmplColors)) {
+    const key = toHex(tmplColors[itemName]);
+
     if (itemName === '背景' && bgTrans) {
-      replacementTable.set(tmplColors[itemName].join('-'), [255, 255, 255, 0]);
+      replacementTable.set(key, transparentColor);
     } else {
-      replacementTable.set(
-        tmplColors[itemName].join('-'),
-        colors[itemName] || tmplColors[itemName]
-      );
+      replacementTable.set(key, colors[itemName] || tmplColors[itemName]);
     }
   }
 
   for (let i = 0; i < image.data.length; i += 4) {
-    const key = Array.from(image.data.slice(i, i + 3)).join('-');
+    const key = toHex(image.data.slice(i, i + 3));
     if (replacementTable.has(key)) {
       const rep = replacementTable.get(key);
       image.data[i] = rep[0];
       image.data[i + 1] = rep[1];
       image.data[i + 2] = rep[2];
-      image.data[i + 3] = typeof rep[3] === 'undefined' ? 255 : rep[3];
+      image.data[i + 3] = rep[3];
     }
   }
 
@@ -98,6 +110,7 @@ $(document).ready(() => {
           .attr({
             name: itemName,
             type: 'color',
+            default: toRgb(defaultColors[itemName]),
             value: toRgb(defaultColors[itemName] || tmplColors[itemName]),
           })
           .on('change', () => updateAquatan())
