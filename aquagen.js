@@ -28,6 +28,8 @@ const defaultColors = {
 
 const transparentColor = [255, 255, 255, 0];
 
+let aquaTmplImage;
+
 function toRgb(arr) {
   return (
     '#' +
@@ -65,9 +67,8 @@ function getNewColorMap() {
 }
 
 function updateAquatan() {
-  const tmpl = document.querySelector('#aquatmpl');
   const canvas = document.querySelector('#output').getContext('2d');
-  canvas.drawImage(tmpl, 0, 0);
+  canvas.drawImage(aquaTmplImage, 0, 0);
 
   const image = canvas.getImageData(0, 0, 128, 128);
   const colors = getNewColorMap();
@@ -130,8 +131,9 @@ $(document).ready(() => {
     link.click();
   });
 
-  updateAquatan();
-  $('#aquatmpl').on('load', () => updateAquatan());
+  aquaTmplImage = document.createElement('img');
+  aquaTmplImage.addEventListener('load', () => updateAquatan());
+  aquaTmplImage.src = 'aquamov.png';
 
   const previewElem = document.querySelector('#preview');
   const previewCtx = previewElem.getContext('2d');
