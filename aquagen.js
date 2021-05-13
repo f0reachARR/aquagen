@@ -125,6 +125,37 @@ function updatePreviewFrame() {
   );
 }
 
+function createGifAndDownload() {
+  const outputElem = document.querySelector('#output');
+  const gif = new GIF({
+    quality: 4,
+    width: 32,
+    height: 32,
+    globalPalette: true,
+  });
+  const gifCanvas = document.createElement('canvas');
+  gifCanvas.width = 32;
+  gifCanvas.height = 32;
+  gifCanvas.style.imageRendering = 'pixelated';
+  const ctx = gifCanvas.getContext('2d');
+  const delay = $('#preview_interval').val();
+
+  for (let i = 0; i < 4; i++) {
+    ctx.clearRect(0, 0, 32, 32);
+    ctx.drawImage(outputElem, i * 32, previewPose * 32, 32, 32, 0, 0, 32, 32);
+    gif.addFrame(ctx, { copy: true, delay });
+  }
+
+  gif.on('finished', (blob) => {
+    const link = document.createElement('a');
+    link.download = 'aquatan.gif';
+    link.href = URL.createObjectURL(blob);
+
+    link.click();
+  });
+  gif.render();
+}
+
 $(document).ready(() => {
   const inputForm = $('#inputform');
   for (const itemName of Object.keys(tmplColors)) {
@@ -156,6 +187,10 @@ $(document).ready(() => {
     link.href = outputElem.toDataURL('image/png');
 
     link.click();
+  });
+
+  $('#gif_download').click(() => {
+    createGifAndDownload();
   });
 
   aquaTmplImage = document.createElement('img');
