@@ -127,22 +127,35 @@ function updatePreviewFrame() {
 
 function createGifAndDownload() {
   const outputElem = document.querySelector('#output');
+  const delay = $('#preview_interval').val();
+  const zoom = $('#gif_zoom').val();
+
   const gif = new GIF({
     quality: 4,
-    width: 32,
-    height: 32,
+    width: 32 * zoom,
+    height: 32 * zoom,
     globalPalette: true,
   });
   const gifCanvas = document.createElement('canvas');
-  gifCanvas.width = 32;
-  gifCanvas.height = 32;
+  gifCanvas.width = 32 * zoom;
+  gifCanvas.height = 32 * zoom;
   gifCanvas.style.imageRendering = 'pixelated';
   const ctx = gifCanvas.getContext('2d');
-  const delay = $('#preview_interval').val();
+  ctx.imageSmoothingEnabled = false;
 
   for (let i = 0; i < 4; i++) {
-    ctx.clearRect(0, 0, 32, 32);
-    ctx.drawImage(outputElem, i * 32, previewPose * 32, 32, 32, 0, 0, 32, 32);
+    ctx.clearRect(0, 0, 32 * zoom, 32 * zoom);
+    ctx.drawImage(
+      outputElem,
+      i * 32,
+      previewPose * 32,
+      32,
+      32,
+      0,
+      0,
+      32 * zoom,
+      32 * zoom
+    );
     gif.addFrame(ctx, { copy: true, delay });
   }
 
