@@ -60,6 +60,18 @@ const colorGroups = {
   胴体: ['胴体1', '胴体2', '胴体3', '胴体4', '胴体5', '胴体6'],
 };
 
+// Color generation constants
+const COLOR_GEN_MIN_SATURATION = 10;
+const COLOR_GEN_MAX_SATURATION = 100;
+const COLOR_GEN_BRIGHTNESS_MIN_FACTOR = 0.6; // 60% of original
+const COLOR_GEN_BRIGHTNESS_MAX_FACTOR = 0.6; // Range: 60% to 120% (0.6 + 0.6)
+const COLOR_GEN_SATURATION_MIN_FACTOR = 0.8; // 80% of original
+const COLOR_GEN_SATURATION_MAX_FACTOR = 0.4; // Range: 80% to 120% (0.8 + 0.4)
+const SCHEME_GEN_BASE_SATURATION = 70;
+const SCHEME_GEN_SATURATION_VARIATION = 20;
+const SCHEME_GEN_BASE_VALUE = 60;
+const SCHEME_GEN_VALUE_VARIATION = 30;
+
 // Convert RGB to HSV
 function rgbToHsv(r, g, b) {
   r /= 255;
@@ -103,22 +115,34 @@ function hsvToRgb(h, s, v) {
   let r, g, b;
   switch (i % 6) {
     case 0:
-      ((r = v), (g = t), (b = p));
+      r = v;
+      g = t;
+      b = p;
       break;
     case 1:
-      ((r = q), (g = v), (b = p));
+      r = q;
+      g = v;
+      b = p;
       break;
     case 2:
-      ((r = p), (g = v), (b = t));
+      r = p;
+      g = v;
+      b = t;
       break;
     case 3:
-      ((r = p), (g = q), (b = v));
+      r = p;
+      g = q;
+      b = v;
       break;
     case 4:
-      ((r = t), (g = p), (b = v));
+      r = t;
+      g = p;
+      b = v;
       break;
     case 5:
-      ((r = v), (g = p), (b = q));
+      r = v;
+      g = p;
+      b = q;
       break;
   }
 
@@ -134,8 +158,19 @@ function generateColorVariations(baseColor, count) {
   for (let i = 0; i < count; i++) {
     const factor = i / Math.max(count - 1, 1);
     // Vary brightness while keeping hue similar
-    const newV = v * (0.6 + factor * 0.6); // Range from 60% to 120% of original
-    const newS = Math.max(10, Math.min(100, s * (0.8 + factor * 0.4))); // Vary saturation slightly
+    const newV =
+      v *
+      (COLOR_GEN_BRIGHTNESS_MIN_FACTOR +
+        factor * COLOR_GEN_BRIGHTNESS_MAX_FACTOR);
+    const newS = Math.max(
+      COLOR_GEN_MIN_SATURATION,
+      Math.min(
+        COLOR_GEN_MAX_SATURATION,
+        s *
+          (COLOR_GEN_SATURATION_MIN_FACTOR +
+            factor * COLOR_GEN_SATURATION_MAX_FACTOR),
+      ),
+    );
     variations.push(hsvToRgb(h, newS, newV));
   }
 
@@ -163,14 +198,15 @@ function generateDistinguishableScheme() {
     if (groupName === '胴体') {
       // Body uses grayscale
       members.forEach((member, i) => {
-        const value = 30 + (i / (members.length - 1)) * 50;
+        const value = 30 + (i / Math.max(members.length - 1, 1)) * 50;
         scheme[member] = hsvToRgb(0, 0, value);
       });
     } else {
       const baseColor = hsvToRgb(
         baseHues[idx],
-        70 + Math.random() * 20,
-        60 + Math.random() * 30,
+        SCHEME_GEN_BASE_SATURATION +
+          Math.random() * SCHEME_GEN_SATURATION_VARIATION,
+        SCHEME_GEN_BASE_VALUE + Math.random() * SCHEME_GEN_VALUE_VARIATION,
       );
       const variations = generateColorVariations(baseColor, members.length);
       members.forEach((member, i) => {
