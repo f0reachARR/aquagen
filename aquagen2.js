@@ -103,22 +103,22 @@ function hsvToRgb(h, s, v) {
   let r, g, b;
   switch (i % 6) {
     case 0:
-      (r = v), (g = t), (b = p);
+      ((r = v), (g = t), (b = p));
       break;
     case 1:
-      (r = q), (g = v), (b = p);
+      ((r = q), (g = v), (b = p));
       break;
     case 2:
-      (r = p), (g = v), (b = t);
+      ((r = p), (g = v), (b = t));
       break;
     case 3:
-      (r = p), (g = q), (b = v);
+      ((r = p), (g = q), (b = v));
       break;
     case 4:
-      (r = t), (g = p), (b = v);
+      ((r = t), (g = p), (b = v));
       break;
     case 5:
-      (r = v), (g = p), (b = q);
+      ((r = v), (g = p), (b = q));
       break;
   }
 
@@ -129,7 +129,7 @@ function hsvToRgb(h, s, v) {
 function generateColorVariations(baseColor, count) {
   const [r, g, b] = baseColor.slice(0, 3);
   const [h, s, v] = rgbToHsv(r, g, b);
-  
+
   const variations = [];
   for (let i = 0; i < count; i++) {
     const factor = i / Math.max(count - 1, 1);
@@ -138,28 +138,28 @@ function generateColorVariations(baseColor, count) {
     const newS = Math.max(10, Math.min(100, s * (0.8 + factor * 0.4))); // Vary saturation slightly
     variations.push(hsvToRgb(h, newS, newV));
   }
-  
+
   return variations;
 }
 
 // Generate a full color scheme with distinguishable colors
 function generateDistinguishableScheme() {
   const baseHues = [
-    0,   // Red for 腹 (belly)
-    30,  // Orange/Brown for 足 (feet)
+    0, // Red for 腹 (belly)
+    30, // Orange/Brown for 足 (feet)
     120, // Green for 帽子 (hat)
     200, // Blue for 目 (eyes)
     210, // Cyan for 頬口手 (cheek/mouth/hand)
-    0,   // Grayscale for 胴体 (body)
+    0, // Grayscale for 胴体 (body)
   ];
-  
+
   const scheme = {};
   const groupNames = ['腹', '足', '帽子', '目', '頬口手', '胴体'];
-  
+
   groupNames.forEach((groupName, idx) => {
     const members = colorGroups[groupName];
     if (!members) return;
-    
+
     if (groupName === '胴体') {
       // Body uses grayscale
       members.forEach((member, i) => {
@@ -170,7 +170,7 @@ function generateDistinguishableScheme() {
       const baseColor = hsvToRgb(
         baseHues[idx],
         70 + Math.random() * 20,
-        60 + Math.random() * 30
+        60 + Math.random() * 30,
       );
       const variations = generateColorVariations(baseColor, members.length);
       members.forEach((member, i) => {
@@ -178,10 +178,10 @@ function generateDistinguishableScheme() {
       });
     }
   });
-  
+
   // Background
   scheme['背景'] = [190, 179, 145, 255];
-  
+
   return scheme;
 }
 
@@ -278,7 +278,7 @@ function updatePreviewFrame() {
     0,
     0,
     32,
-    32
+    32,
   );
 }
 
@@ -311,7 +311,7 @@ function createGifAndDownload() {
       0,
       0,
       32 * zoom,
-      32 * zoom
+      32 * zoom,
     );
     gif.addFrame(ctx, { copy: true, delay });
   }
@@ -341,19 +341,19 @@ function applyColorScheme(scheme) {
 function generateGroupColors(groupName) {
   const members = colorGroups[groupName];
   if (!members || members.length === 0) return;
-  
+
   // Get the base color from the first member of the group
   const baseInput = $(`input[name="${members[0]}"]`);
   if (!baseInput.length) return;
-  
+
   const baseColor = fromRgb(baseInput.val());
   const variations = generateColorVariations(baseColor, members.length);
-  
+
   const scheme = {};
   members.forEach((member, i) => {
     scheme[member] = variations[i];
   });
-  
+
   applyColorScheme(scheme);
 }
 
@@ -365,46 +365,65 @@ function autoGenerateAllColors() {
 
 $(document).ready(() => {
   const inputForm = $('#inputform');
-  
+
   // Add auto-generate all button at the top
   $('<div>')
-    .css({ 'width': '100%', 'padding': '10px 0', 'border-bottom': '2px solid #ccc', 'margin-bottom': '10px' })
+    .css({
+      width: '100%',
+      padding: '10px 0',
+      'border-bottom': '2px solid #ccc',
+      'margin-bottom': '10px',
+    })
     .append(
       $('<button>')
         .attr('type', 'button')
         .text('🎨 全体の色を自動生成')
-        .css({ 'padding': '8px 16px', 'font-size': '14px', 'cursor': 'pointer' })
-        .click(() => autoGenerateAllColors())
+        .css({ padding: '8px 16px', 'font-size': '14px', cursor: 'pointer' })
+        .click(() => autoGenerateAllColors()),
     )
     .appendTo(inputForm);
-  
+
   // Create sections for each color group
   const processedItems = new Set();
-  
+
   for (const [groupName, members] of Object.entries(colorGroups)) {
-    const groupDiv = $('<div>')
-      .css({ 'width': '100%', 'padding': '10px', 'border': '1px solid #ddd', 'margin': '5px 0', 'background': '#f9f9f9' });
-    
+    const groupDiv = $('<div>').css({
+      width: '100%',
+      padding: '10px',
+      border: '1px solid #ddd',
+      margin: '5px 0',
+      background: '#f9f9f9',
+    });
+
     // Add group header with auto-generate button
-    const headerDiv = $('<div>')
-      .css({ 'display': 'flex', 'align-items': 'center', 'margin-bottom': '8px', 'font-weight': 'bold' });
-    
+    const headerDiv = $('<div>').css({
+      display: 'flex',
+      'align-items': 'center',
+      'margin-bottom': '8px',
+      'font-weight': 'bold',
+    });
+
     headerDiv.append($('<span>').text(groupName + ' '));
     headerDiv.append(
       $('<button>')
         .attr('type', 'button')
         .text('色を自動生成')
-        .css({ 'margin-left': '10px', 'padding': '4px 8px', 'font-size': '12px', 'cursor': 'pointer' })
-        .click(() => generateGroupColors(groupName))
+        .css({
+          'margin-left': '10px',
+          padding: '4px 8px',
+          'font-size': '12px',
+          cursor: 'pointer',
+        })
+        .click(() => generateGroupColors(groupName)),
     );
-    
+
     groupDiv.append(headerDiv);
-    
+
     // Add individual color inputs for this group
-    const colorsDiv = $('<div>').css({ 'display': 'flex', 'flex-wrap': 'wrap' });
+    const colorsDiv = $('<div>').css({ display: 'flex', 'flex-wrap': 'wrap' });
     members.forEach((itemName) => {
       $('<div>')
-        .css({ 'padding': '0 0.4em' })
+        .css({ padding: '0 0.4em' })
         .append($('<label>').text(itemName))
         .append(
           $('<input>')
@@ -414,16 +433,16 @@ $(document).ready(() => {
               default: toRgb(defaultColors[itemName]),
               value: toRgb(defaultColors[itemName] || tmplColors[itemName]),
             })
-            .on('change', () => updateAquatan())
+            .on('change', () => updateAquatan()),
         )
         .appendTo(colorsDiv);
       processedItems.add(itemName);
     });
-    
+
     groupDiv.append(colorsDiv);
     groupDiv.appendTo(inputForm);
   }
-  
+
   // Add remaining items (like 背景) that aren't in groups
   for (const itemName of Object.keys(tmplColors)) {
     if (!processedItems.has(itemName)) {
@@ -437,7 +456,7 @@ $(document).ready(() => {
               default: toRgb(defaultColors[itemName]),
               value: toRgb(defaultColors[itemName] || tmplColors[itemName]),
             })
-            .on('change', () => updateAquatan())
+            .on('change', () => updateAquatan()),
         )
         .appendTo(inputForm);
     }
